@@ -6,6 +6,32 @@ class AbilityTest < ActiveSupport::TestCase
     @ability = Ability.new(@user)
   end
 
+  test 'allows user to read pages that they authored' do
+    page = Page.create!(user: @user)
+
+    assert @ability.can?(:read, page)
+  end
+
+  test 'allows user to read blog posts that they authored' do
+    blog_post = BlogPost.create!(user: @user)
+
+    assert @ability.can?(:read, blog_post)
+  end
+
+  test 'does not allow user to read pages authored by someone else' do
+    another_user = User.create!
+    page = Page.create!(user: another_user)
+
+    assert @ability.cannot?(:read, page)
+  end
+
+  test 'does not allow user to read blog posts authored by someone else' do
+    another_user = User.create!
+    blog_post = BlogPost.create!(user: another_user)
+
+    assert @ability.cannot?(:read, blog_post)
+  end
+
   test 'allows user to read comments on pages that they authored' do
     page = Page.create!(user: @user)
     comment = Comment.create!(page: page)
